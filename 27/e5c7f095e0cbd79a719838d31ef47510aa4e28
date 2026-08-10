@@ -1,0 +1,21 @@
+profile/README.md
+  s_223a8922d2562c::t_ea40b9507cb862 3-5
+brand/README.md
+  s_223a8922d2562c::t_4dce5ee38d237d 11-14,16,18-21,23,25,27-31,33-34,38-39,41,43-51,55-66,74-76,84,86-90,92-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "27e5c7f095e0cbd79a719838d31ef47510aa4e28",
+  "prompts": {},
+  "sessions": {
+    "s_223a8922d2562c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "169bf608-8129-4523-9428-738d473802c9",
+        "model": "claude-opus-5"
+      },
+      "human_author": "shenxianpeng <xianpeng.shen@gmail.com>"
+    }
+  }
+}
