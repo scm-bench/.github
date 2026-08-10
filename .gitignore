@@ -1,0 +1,11 @@
+# brand/build.mjs renders through a headless browser, which needs its pages on
+# disk to load them over file://. They are removed on a clean run; this covers
+# the run that dies partway through.
+brand/.build-*.html
+
+# Only needed to run brand/build.mjs by hand. Nothing here is a JS project.
+# No trailing slash: this is often a symlink to a global install, and
+# "node_modules/" matches a real directory only.
+node_modules
+
+.DS_Store
