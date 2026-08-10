@@ -8,76 +8,62 @@ URL, so moving or renaming a file here breaks a page somewhere else — grep the
 organization before you do.
 
 The identity has one job: look like a tool you would trust with a security
-verdict. The register is print, not poster — paper ground, editorial margins,
-monospace type, and a right-hand side that is not decoration but the product's
-own output drawn carefully.
-
-## The banner is a report
-
-The right side of the banner renders the example snapshot shipped with the tool
-(`examples/snapshot.json` in `scm-bench/scm-bench`) as an audit matrix, kept
-here as hand-authored data rather than read across repositories at build time:
-`payments-api` passes
-everything, `legacy-billing` fails review after review, `vendor-mirror` could
-not be read and shows as MANUAL amber. Columns group into the control families
-(`REVIEW · HISTORY · CI · HYGIENE · ACCESS`). Above it, a pull request's life
-in git-graph shorthand: work branches off, one commit needs a human's eyes
-(the amber ring), and what merges back turns the line green.
-
-Someone who knows the tool recognises their own terminal. Someone who does not
-still reads "audits repositories, honestly".
+verdict. The register is technical drawing, not poster — a measured grid,
+registration marks at the corners, hairline frames, and a single steel blue
+doing all the accent work. Nothing is decorative; everything reads as something
+that was measured rather than styled.
 
 ## The mark
 
-Three commit nodes joined by two strokes. Read quickly it is a check mark;
-read slowly it is a commit graph — which is what the tool verifies.
+A branch line ending in an open commit node, curving into a checked box. Read
+quickly it is a check mark; read slowly it is a branch that was inspected and
+cleared — which is what the tool verifies. The node stays open rather than
+filled, because the tool reports on a repository, it does not close anything.
 
-It degrades rather than breaks: the nodes are only slightly wider than the
-stroke, so at the 20px GitHub uses in a timeline the swelling vanishes and a
-clean check remains, while at 48px and up the three nodes separate and the
-graph reading arrives. Ring nodes were tried and rejected on evidence — the
-holes closed up at exactly the sizes that matter.
+It carries no type, so it survives at avatar sizes where the wordmark would not.
 
-In the wordmark lockup the mark stands where a terminal cursor would:
-`scm-bench ✓` is a command that exited 0.
+## The banner is a verdict
+
+The right-hand panel of the banner is the tool's own output, not an ornament:
+the score from the example snapshot shipped with the tool (`examples/snapshot.json`
+in `scm-bench/scm-bench`) — `53/100`, `PASS 15`, `FAIL 13`, `MANUAL 19`. The
+`MANUAL` count sits in the same row as the other two on purpose. A tool that
+hides how much it could not determine is the thing this project exists not to be.
+
+The three tags underneath — `READ-ONLY`, `REGO POLICIES`, `SARIF` — are what
+someone scanning the README needs to know before they read a word of prose.
 
 ## Colour
 
-Both palettes track GitHub's own themes, so each banner sits on the README as
-part of the page rather than a poster pasted on. The four verdict colours are
-used for nothing else.
+Two grounds, one accent. The steel blue holds its value on both, so the mark
+needs no second version to survive the theme switch.
 
-| Token | Light | Dark | Meaning |
+| Token | Light | Dark | Use |
 |---|---|---|---|
-| paper | `#FFFFFF` | `#0D1117` | ground |
-| ink | `#1F2328` | `#E6EDF3` | primary type |
-| muted | `#59636E` | `#9198A1` | secondary type |
-| green | `#2DA44E` | `#3FB950` | PASS, and the brand |
-| green (texture) | `#8CE09F` | `#2EA043` | PASS, lighter cells |
-| amber | `#D4A72C` | `#D29922` | MANUAL |
-| red | `#E5534B` | `#F85149` | FAIL |
-| na | `#EAEEF2` | `#21262D` | N/A |
+| paper | `#F2F2F3` | `#1D2D3D` | ground |
+| ink | `#1D1F20` | `#F2F2F3` | wordmark, primary type |
+| muted | `#5D5D60` | `#B5D9FD` | secondary type, score detail |
+| steel | `#416180` | `#416180` | the mark, badge rules, accents |
+| grid | `#E5EFF8` | `#25394D` | the blueprint grid |
+| hairline | `#D4D4D7` | `#25394D` | frames, separators, registration marks |
 
-`mark.svg` uses `#2DA44E`, which holds on either ground. The avatar is a white
-tile with a faint dot grid and **one amber dot** — the project's defining
-behaviour is admitting what it could not determine, and the identity says so
-quietly rather than claiming everything is green.
-
-## Type
-
-**Geist Mono** only — bold for the wordmark, regular for everything else. The
-output people actually see is a terminal, and one family keeps the register
-honest.
+The dark ground is a navy rather than GitHub's near-black, which keeps the
+banner reading as a drawing on paper rather than as a hole in the page.
 
 ## Files
 
-| File | Use |
-|---|---|
-| `mark.svg` | The mark alone, transparent, no font dependency. Safe anywhere. |
-| `avatar.svg` | Avatar source. Full bleed — GitHub rounds it itself. |
-| `png/avatar-512.png` / `-1024.png` | Upload as the organization avatar. |
-| `png/banner-light.png` / `-dark.png` | README header, one per theme. |
-| `png/social-preview.png` | 1280×640 content at 2×; the single image GitHub allows. |
+| File | Size | Use |
+|---|---|---|
+| `banner-light-1760x440.png` / `banner-dark-1760x440.png` | 1760×440 | README header, one per theme. Embedded at `width="880"` — the file is 2× so it stays sharp on retina. |
+| `avatar-light-464.png` | 464×464 | Avatar on a light surface. |
+| `avatar-dark-512.png` | 512×512 | Avatar on a dark surface. |
+| `social-preview-1280x640.png` | 1280×640 | GitHub's social preview at the exact size it asks for. |
+| `social-preview-2560x1280.png` | 2560×1280 | The same image at 2×, for anywhere that wants it sharper. |
+
+GitHub allows exactly one organization avatar, so only one of the two is ever
+uploaded; the other is kept for slides, talks, and any surface with the opposite
+ground. The two are not the same pixel size — 464 is what the light export
+happened to produce. Even them up at 512 the next time these are regenerated.
 
 Embed the banner with theme switching. The URLs are absolute because the
 consumers are in other repositories, where a relative path would resolve
@@ -85,9 +71,9 @@ against the wrong tree:
 
 ```html
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/scm-bench/.github/main/brand/png/banner-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/scm-bench/.github/main/brand/png/banner-light.png">
-  <img src="https://raw.githubusercontent.com/scm-bench/.github/main/brand/png/banner-light.png" alt="scm-bench" width="880">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/scm-bench/.github/main/brand/banner-dark-1760x440.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/scm-bench/.github/main/brand/banner-light-1760x440.png">
+  <img src="https://raw.githubusercontent.com/scm-bench/.github/main/brand/banner-light-1760x440.png" alt="scm-bench" width="880">
 </picture>
 ```
 
@@ -95,16 +81,14 @@ Absolute URLs also survive the trip into a release archive: `README.md` is
 shipped inside every tarball, where a repository-relative image path points at
 nothing at all.
 
-## Rebuilding
+## Source
 
-`mark.svg` and `avatar.svg` are hand-edited. The banners and social preview
-carry type and are generated, because a standalone SVG would render
-differently wherever the font is missing:
+**These PNGs are the only copies.** The previous identity — a green terminal
+register with an audit matrix — was generated by a `build.mjs` Playwright script
+from hand-edited SVGs; that script, its SVG sources, and its bundled Geist Mono
+files were removed when this set landed, because they render the old mark and
+nothing else.
 
-```bash
-node brand/build.mjs
-```
-
-Requires `playwright`; the project itself does not depend on it. The matrix is
-hand-authored data, not randomness, so rebuilding without editing produces an
-identical file rather than a spurious diff.
+Until a source file for this identity lands here, changing a banner means
+re-exporting it from wherever it was made. Do not retouch the PNGs — a
+hand-edited raster is a file nobody can regenerate.
