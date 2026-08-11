@@ -26,13 +26,17 @@ documented manual checks so the mapping is complete rather than quietly
 partial.
 
 ```
-SCORE  53/100   passed 15   failed 13   manual 19   n/a 1
-       weighted 29/55 (HIGH=3, MEDIUM=2, LOW=1; manual and n/a excluded)
+SCORE 53/100   15 passed  13 failed  19 manual  1 n/a
+      weighted 29/55 (HIGH=3, MEDIUM=2, LOW=1; manual and n/a excluded)
 
-CIS-1.1.15  HIGH  Ensure pushing is restricted to trusted users
-  PLAT/legacy-billing  Anyone with write access can push directly to master.
-  fix: Repository settings -> Branch permissions -> Add restriction: select
-       the default branch and enable "Prevent changes without a pull request".
+┌────────────┬──────────┬────────┬───────────┬────────────────────────────────────────┐
+│  Control   │ Severity │ Status │ Resources │                 Title                  │
+├────────────┼──────────┼────────┼───────────┼────────────────────────────────────────┤
+│ CIS-1.1.15 │ HIGH     │ FAIL   │       1/3 │ No direct pushes to the default branch │
+└────────────┴──────────┴────────┴───────────┴────────────────────────────────────────┘
+
+fix: Repository settings -> Branch permissions -> Add restriction: select
+     the default branch and enable "Prevent changes without a pull request".
 ```
 
 ---
