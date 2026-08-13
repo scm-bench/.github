@@ -14,16 +14,28 @@ actually stop unreviewed code from shipping.
 
 That is what this organization works on.
 
-### [scm-bench](https://github.com/scm-bench/scm-bench)
+### The projects
 
-A read-only CLI that audits a source control platform against the **Source
-Code** section of the CIS Software Supply Chain Security Guide, and tells you
-the exact settings path to fix whatever it finds.
+One tool per platform, each named after what it audits, each a read-only CLI
+that reports in the same shape: a score, a verdict per control, and the exact
+settings path to fix whatever it finds.
 
-**v0.1 targets Bitbucket Data Center**, which has the least tooling in this
-space. 15 controls are evaluated automatically; 5 more are carried as
-documented manual checks so the mapping is complete rather than quietly
-partial.
+| | | |
+|---|---|---|
+| [**bitbucket-bench**](https://github.com/scm-bench/bitbucket-bench) | Bitbucket Data Center | v0.1 · the reference implementation |
+| [**azure-devops-bench**](https://github.com/scm-bench/azure-devops-bench) | Azure DevOps / Azure Repos | planned |
+| [**jenkins-bench**](https://github.com/scm-bench/jenkins-bench) | Jenkins controllers | planned |
+| [**scm-bench**](https://github.com/scm-bench/scm-bench) | — | the specification they all follow |
+
+`scm-bench` is the umbrella: the policy contract, the control metadata format,
+the scoring rule and the snapshot schemas live there, so a `FAIL` from one tool
+means what a `FAIL` from another means. It is a specification, not a library —
+each bench stays a self-contained binary you can download and run.
+
+**bitbucket-bench** is furthest along, targeting the platform with the least
+tooling in this space. 15 controls are evaluated automatically; 5 more are
+carried as documented manual checks so the mapping is complete rather than
+quietly partial.
 
 ```
 SCORE 53/100   15 passed  13 failed  19 manual  1 n/a
@@ -67,9 +79,14 @@ wrongly against a real instance, or remediation text that does not match what
 the UI actually says, is worth more than a refactor — most of this has only
 ever run against a stand-in server.
 
-Start with [CONTRIBUTING.md](https://github.com/scm-bench/scm-bench/blob/main/CONTRIBUTING.md).
-Security issues go through
-[private advisories](https://github.com/scm-bench/scm-bench/security/advisories/new),
+Start with
+[bitbucket-bench's CONTRIBUTING.md](https://github.com/scm-bench/bitbucket-bench/blob/main/CONTRIBUTING.md)
+— it is where the practice is written down. What a verdict has to mean, in any
+of these tools, is in the
+[bench contract](https://github.com/scm-bench/scm-bench/blob/main/docs/bench-contract.md).
+
+Security issues go through private advisories on the repository concerned
+([bitbucket-bench](https://github.com/scm-bench/bitbucket-bench/security/advisories/new)),
 never a public issue.
 
-<sub>Apache 2.0 · Not affiliated with CIS or Atlassian.</sub>
+<sub>Apache 2.0 · Not affiliated with CIS, Atlassian, Microsoft or the Jenkins project.</sub>
