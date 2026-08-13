@@ -1,11 +1,11 @@
 # Brand
 
-These files live here rather than in `scm-bench/scm-bench` because more than
-one repository draws on them: the organization profile above, the tool's own
-README, and the avatar and social preview that are uploaded by hand. Anything
-outside this repository references them by absolute `raw.githubusercontent.com`
-URL, so moving or renaming a file here breaks a page somewhere else — grep the
-organization before you do.
+These files live here rather than in any one project repository because every
+repository in the organization draws on them: the organization profile above,
+each bench's README, the umbrella spec repository, and the avatar and social
+preview that are uploaded by hand. Everything outside this repository references
+them by absolute `raw.githubusercontent.com` URL, so moving or renaming a file
+here breaks a page somewhere else — grep the organization before you do.
 
 The identity has one job: look like a tool you would trust with a security
 verdict. The register is technical drawing, not poster — a measured grid,
@@ -24,9 +24,10 @@ It carries no type, so it survives at avatar sizes where the wordmark would not.
 
 ## The banner is a verdict
 
-The right-hand panel of the banner is the tool's own output, not an ornament:
-the score from the example snapshot shipped with the tool (`examples/snapshot.json`
-in `scm-bench/scm-bench`) — `53/100`, `PASS 15`, `FAIL 13`, `MANUAL 19`. The
+The right-hand panel of the banner is real output, not an ornament: the score
+from the example snapshot shipped with the reference implementation
+(`examples/snapshot.json` in `scm-bench/bitbucket-bench`) — `53/100`, `PASS 15`,
+`FAIL 13`, `MANUAL 19`. The
 `MANUAL` count sits in the same row as the other two on purpose. A tool that
 hides how much it could not determine is the thing this project exists not to be.
 
