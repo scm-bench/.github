@@ -1,15 +1,5 @@
-# Reusable reference-URL check. Every control ships remediation text and a
-# `references` list, and those links are the part a user actually clicks when a
-# control fires. They rot silently: vendors reorganise their documentation, so
-# a URL that worked at authoring time can 404 a year later with nothing in the
-# repository having changed.
-#
-#   jobs:
-#     links:
-#       uses: scm-bench/.github/.github/workflows/go-bench-links.yml@main
-#
-# The caller owns the trigger — a weekly schedule plus pull requests that touch
-# the files carrying URLs is the shape the benches use.
+# Reusable reference-URL check: the links a control hands to users rot silently
+# as vendors reorganise their docs. The caller owns the trigger.
 name: Go bench links
 
 on:
@@ -24,12 +14,7 @@ jobs:
 
       - name: Collect the URLs the tool hands to users
         run: |
-          # Tests are excluded because their URLs are fixtures, not references.
-          # `https://confluence.atlassian.com/x` is a stand-in in a table that
-          # asserts a vendor page outranks the CIS one; it is not a page and was
-          # never meant to resolve. Sweeping it in failed the job for a reason
-          # no reader of a report could ever encounter — which is the failure
-          # mode this job exists to avoid, pointed at itself.
+          # Tests excluded: their URLs are fixtures, not references.
           grep -rhoE 'https://[^"[:space:]]+' \
             --exclude='*_test.go' --exclude='*_test.rego' \
             internal/checks/policies internal/report \
@@ -41,15 +26,8 @@ jobs:
 
       - name: Check each one resolves
         run: |
-          # The distinction below is the same one the tool itself makes, and it
-          # matters for the same reason. A 404 is a fact: the page is gone, and
-          # the reference is wrong. A 403 or 429 is a host declining to talk to
-          # a CI runner, which says nothing about whether the page exists —
-          # failing on it would train everyone to ignore this job, which is
-          # exactly how the broken link survived in the first place.
-          #
-          # So: 404/410 and 5xx fail the build. Anything unverifiable is
-          # reported as a warning and left for a human.
+          # 404/410/5xx fail: the page is gone. 403/429 warn: a host declining
+          # a CI runner says nothing about whether the page exists.
           broken=0
           unverified=0
 

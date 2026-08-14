@@ -1,18 +1,6 @@
-# Reusable CI for every Go bench in the family.
-#
-# One definition, called from each repository with the bench's name:
-#
-#   jobs:
-#     ci:
-#       uses: scm-bench/.github/.github/workflows/go-bench-ci.yml@main
-#       with:
-#         bench: jenkins-bench
-#
-# It lives here rather than being copied per repository because CI is the one
-# place the benches must not drift apart: the coverage floors, the read-only
-# image check and the tidy check are family rules, and a rule enforced by N
-# diverging copies stops being a rule. A bench with a genuinely different need
-# overrides an input; it does not fork the pipeline.
+# Reusable CI for every Go bench. Called with the bench's name; defined once so
+# the family's rules (coverage floors, non-root image, tidy check) cannot drift
+# between repositories. A bench overrides an input, never forks the pipeline.
 name: Go bench CI
 
 on:
@@ -45,11 +33,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The release builds darwin and windows archives, and the code that
-        # decides them apart — terminal detection, signal handling, path
-        # handling — is exactly the code a linux-only job never exercises.
-        # Linting and coverage run once, on linux; the others just run the
-        # tests.
+        # Release ships darwin/windows archives; only a matrix exercises the
+        # code that tells the platforms apart. Lint and coverage run once.
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v7
@@ -67,9 +52,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: make vet
 
-      # go.mod and go.sum are what the release builds from, and .goreleaser.yaml
-      # runs `go mod tidy` during a release — so a repository whose modules are
-      # untidy produces a release built from a dependency set nobody tested.
+      # Untidy modules mean a release built from a dependency set nobody tested.
       - name: Check go.mod is tidy
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -79,9 +62,8 @@ jobs:
             exit 1
           }
 
-      # -coverpkg is the point: without it Go measures each package only from
-      # its own tests, so a package exercised mostly by the CLI tests reads as
-      # barely covered. The number was measuring the wrong thing.
+      # -coverpkg: without it a package exercised by another package's tests
+      # reads as uncovered.
       - name: Test
         if: matrix.os == 'ubuntu-latest'
         run: go test ./... -race -count=1 -coverpkg=./... -coverprofile=coverage.out -covermode=atomic
@@ -98,8 +80,7 @@ jobs:
           set -euo pipefail
           go tool cover -func=coverage.out | tail -1
           total=$(go tool cover -func=coverage.out | tail -1 | grep -oE '[0-9]+\.[0-9]+')
-          # A floor, not a target. It is here to catch a change that drops whole
-          # files out of the tested set.
+          # A floor, not a target: catches files dropping out of the tested set.
           awk -v t="$total" -v floor="$FLOOR" 'BEGIN {
             printf "total coverage: %s%% (floor %s%%)\n", t, floor
             if (t + 0 < floor + 0) { printf "::error::coverage %s%% is below the %s%% floor\n", t, floor; exit 1 }
@@ -135,8 +116,7 @@ jobs:
       - name: Check Rego formatting
         run: opa fmt --list --fail ${{ inputs.policy-path }}
 
-      # Rego is where every verdict is actually decided, and `go test -cover`
-      # cannot see any of it.
+      # Every verdict is decided in Rego, which go test -cover cannot see.
       - name: Run the policy unit tests
         run: opa test ${{ inputs.policy-path }} -v
 
@@ -146,9 +126,7 @@ jobs:
         run: |
           set -euo pipefail
           opa test ${{ inputs.policy-path }} --coverage --format=json > policy-coverage.json
-          # Held at 100 by default. The bundle is small, every branch of it is a
-          # verdict somebody will act on, and an uncovered branch is a verdict
-          # nobody has ever seen the rule produce.
+          # 100 by default: an uncovered branch is a verdict nobody has seen.
           jq -r '.coverage' policy-coverage.json | awk -v floor="$FLOOR" '{
             printf "policy coverage: %s%% (floor %s%%)\n", $1, floor
             if ($1 + 0 < floor + 0) { printf "::error::policy coverage %s%% is below %s%%\n", $1, floor; exit 1 }
@@ -168,9 +146,8 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      # A tool that audits other people's supply chains should know about its
-      # own. govulncheck reports only what this code actually reaches, so a
-      # finding here is a call path, not a dependency-tree coincidence.
+      # govulncheck reports only reachable vulnerabilities: a finding is a call
+      # path, not a dependency-tree coincidence.
       - name: govulncheck
         run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
@@ -185,8 +162,7 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      # A snapshot build exercises the full release matrix on every push, so a
-      # broken goreleaser config is found before a tag depends on it.
+      # Finds a broken goreleaser config before a tag depends on it.
       - uses: goreleaser/goreleaser-action@v7
         with:
           version: "~> v2"
@@ -200,11 +176,8 @@ jobs:
 
       - uses: docker/setup-buildx-action@v4
 
-      # `goreleaser build` does not build images, so nothing checked the
-      # Dockerfiles until a tag was pushed — and a release cannot be
-      # unpublished. Both are built here: Dockerfile from source, and the
-      # release image against a stand-in binary, since its whole job is to
-      # copy one in from the build context.
+      # goreleaser build skips images, and a release cannot be unpublished —
+      # so both Dockerfiles are checked here.
       - name: Build the source image
         uses: docker/build-push-action@v6
         with:
@@ -218,8 +191,7 @@ jobs:
           set -euo pipefail
           docker run --rm ${{ inputs.bench }}:ci version
           docker run --rm ${{ inputs.bench }}:ci list-checks | tail -1
-          # The image must not run as root: it is handed a credential that can
-          # read everything the bench audits.
+          # Not as root: the image is handed a credential.
           user=$(docker run --rm --entrypoint id ${{ inputs.bench }}:ci -u)
           if [ "$user" = "0" ]; then
             echo "::error::the image runs as root"
@@ -229,9 +201,7 @@ jobs:
       - name: Build the release image
         run: |
           set -euo pipefail
-          # Dockerfile.goreleaser expects a prebuilt binary beside it, which is
-          # what goreleaser puts there. Standing one in checks the COPY path
-          # and the entrypoint without running a release.
+          # Dockerfile.goreleaser expects a prebuilt binary; stand one in.
           CGO_ENABLED=0 go build -trimpath -o ${{ inputs.bench }} ./cmd/${{ inputs.bench }}
           docker build -f Dockerfile.goreleaser -t ${{ inputs.bench }}:ci-release .
           docker run --rm ${{ inputs.bench }}:ci-release version
