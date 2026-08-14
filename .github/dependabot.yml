@@ -1,0 +1,16 @@
+# Updates here reach every bench at once: the workflows in this repository are
+# the reusable pipelines the whole family calls via @main. Weekly, matching the
+# bench repositories.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels: [dependencies, ci]
+    groups:
+      # Minor and patch bumps arrive as one pull request rather than a stream.
+      # Majors stay separate: the release workflow's actions are SHA-pinned on
+      # purpose, and a major bump there deserves its own review.
+      actions-minor:
+        update-types: [minor, patch]
