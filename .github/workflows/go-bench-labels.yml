@@ -1,0 +1,63 @@
+# Reusable label sync. The label set lives ONCE, in this repository's
+# labels.json; every bench pulls from it, so the categories release notes group
+# by cannot drift between repositories.
+#
+#   jobs:
+#     labels:
+#       uses: scm-bench/.github/.github/workflows/go-bench-labels.yml@main
+#
+# Labels are not cosmetic here: each repo's .github/release.yml groups its
+# release notes by label, so a label that does not exist means a category that
+# silently never fills.
+name: Go bench labels
+
+on:
+  workflow_call: {}
+
+jobs:
+  sync:
+    name: Sync labels
+    runs-on: ubuntu-latest
+    steps:
+      # The central label set, not the calling repository's working tree: the
+      # whole point is that there is no per-repository copy to drift.
+      - uses: actions/checkout@v7
+        with:
+          repository: scm-bench/.github
+          ref: main
+
+      - name: Apply the family labels.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # jq rather than a YAML parser: it ships on the runner image, so this
+          # depends on nothing that has to be installed first.
+          jq -e 'type == "array" and length > 0' labels.json > /dev/null
+
+          jq -r '.[] | [.name, .color, .description] | @tsv' labels.json |
+            while IFS=$'\t' read -r name color description; do
+              # --force updates a label that already exists, which covers the
+              # defaults GitHub creates with every repository.
+              gh label create "$name" \
+                --color "$color" \
+                --description "$description" \
+                --force
+              echo "  $name"
+            done
+
+      - name: Report labels not in the file
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # Deliberately reports rather than deletes: removing a label strips it
+          # from every issue that carries it, which is not something a routine
+          # sync should do silently.
+          comm -23 \
+            <(gh label list --limit 200 --json name --jq '.[].name' | sort) \
+            <(jq -r '.[].name' labels.json | sort) \
+            | sed 's/^/  not in labels.json: /'
