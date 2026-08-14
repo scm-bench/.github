@@ -1,0 +1,25 @@
+ISSUE_TEMPLATE/bug.yml
+  s_c41547041c8c0c::t_0b593d6a8e8deb 1-63
+ISSUE_TEMPLATE/new-control.yml
+  s_c41547041c8c0c::t_ce7edbcc046c2e 1-55
+ISSUE_TEMPLATE/wrong-verdict.yml
+  s_c41547041c8c0c::t_d3af192743b577 1-65
+pull_request_template.md
+  s_c41547041c8c0c::t_ae92ac2cdc50a3 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "91d117e3582f8b3ca76e7ee00c41d9da23744e09",
+  "prompts": {},
+  "sessions": {
+    "s_c41547041c8c0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ac392fc3-826e-4ace-a7b5-c23048caa17e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "shenxianpeng <xianpeng.shen@gmail.com>"
+    }
+  }
+}
