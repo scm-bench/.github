@@ -179,7 +179,7 @@ jobs:
       # goreleaser build skips images, and a release cannot be unpublished —
       # so both Dockerfiles are checked here.
       - name: Build the source image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
