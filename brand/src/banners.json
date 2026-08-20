@@ -1,0 +1,91 @@
+[
+  {
+    "slug": "scm-bench",
+    "name": "scm-bench",
+    "subtitle": "Audit source control against the CIS Software Supply<br>Chain Benchmark.",
+    "tags": [
+      "READ-ONLY",
+      "REGO POLICIES",
+      "SARIF"
+    ],
+    "score": 53,
+    "counts": [
+      [
+        "PASS",
+        15
+      ],
+      [
+        "FAIL",
+        13
+      ],
+      [
+        "MANUAL",
+        19
+      ]
+    ]
+  },
+  {
+    "slug": "bitbucket-bench",
+    "name": "bitbucket-bench",
+    "subtitle": "Audit Bitbucket Data Center against the CIS Software<br>Supply Chain Benchmark.",
+    "tags": [
+      "READ-ONLY",
+      "REGO POLICIES",
+      "SARIF"
+    ],
+    "score": 53,
+    "counts": [
+      [
+        "PASS",
+        15
+      ],
+      [
+        "FAIL",
+        13
+      ],
+      [
+        "MANUAL",
+        19
+      ]
+    ]
+  },
+  {
+    "slug": "jenkins-bench",
+    "name": "jenkins-bench",
+    "subtitle": "Audit Jenkins controllers against the CIS Software<br>Supply Chain Benchmark.",
+    "tags": [
+      "GET-ONLY",
+      "REGO POLICIES",
+      "SARIF"
+    ],
+    "score": 44,
+    "counts": [
+      [
+        "PASS",
+        7
+      ],
+      [
+        "FAIL",
+        7
+      ],
+      [
+        "MANUAL",
+        22
+      ]
+    ]
+  },
+  {
+    "slug": "azure-devops-bench",
+    "name": "azure-devops-bench",
+    "subtitle": "Audit Azure DevOps against the CIS Software Supply<br>Chain Benchmark.",
+    "tags": [
+      "PLANNED",
+      "SCM SNAPSHOT V1"
+    ],
+    "status": "PLANNED",
+    "statusrow": [
+      "SHARES THE SCM DOMAIN SCHEMA"
+    ],
+    "wordsize": 104
+  }
+]
