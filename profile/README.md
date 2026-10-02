@@ -22,9 +22,9 @@ settings path to fix whatever it finds.
 
 | | | |
 |---|---|---|
-| [**bitbucket-bench**](https://github.com/scm-bench/bitbucket-bench) | Bitbucket Data Center | v0.1 · the reference implementation |
-| [**azure-devops-bench**](https://github.com/scm-bench/azure-devops-bench) | Azure DevOps / Azure Repos | planned |
-| [**jenkins-bench**](https://github.com/scm-bench/jenkins-bench) | Jenkins controllers | planned |
+| [**bitbucket-bench**](https://github.com/scm-bench/bitbucket-bench) | Bitbucket Data Center | the reference implementation · verified on Data Center 8.19–10.5 |
+| [**jenkins-bench**](https://github.com/scm-bench/jenkins-bench) | Jenkins controllers | verified on Jenkins 2.580 LTS |
+| [**azure-devops-bench**](https://github.com/scm-bench/azure-devops-bench) | Azure DevOps Services and Server | preview · not yet verified against a live organization |
 | [**scm-bench**](https://github.com/scm-bench/scm-bench) | — | the specification they all follow |
 
 `scm-bench` is the umbrella: the policy contract, the control metadata format,
@@ -32,23 +32,27 @@ the scoring rule and the snapshot schemas live there, so a `FAIL` from one tool
 means what a `FAIL` from another means. It is a specification, not a library —
 each bench stays a self-contained binary you can download and run.
 
-**bitbucket-bench** is furthest along, targeting the platform with the least
-tooling in this space. 15 controls are evaluated automatically; 5 more are
-carried as documented manual checks so the mapping is complete rather than
-quietly partial.
+A tool says it works on a platform once it has been checked against a real
+one: a disposable instance, seeded so every control is in a known state, and
+scanned with tokens of different reach — every verdict compared with what the
+fixture actually is. Controls no API can answer are carried as documented manual
+checks, so the mapping to the benchmark is complete rather than quietly partial.
+
+A scan of bitbucket-bench's bundled example, start and end:
 
 ```
-SCORE 53/100   15 passed  13 failed  19 manual  1 n/a
-      weighted 29/55 (HIGH=3, MEDIUM=2, LOW=1; manual and n/a excluded)
+PLAT/legacy-billing  CIS-1.1.3 HIGH: Pull requests require 0 approval(s); at least 2
+    independent approvals are needed.
+    fix: Set "Minimum approvals" to at least 2 at Repository settings -> Pull
+    requests -> Merge checks.
+    · requiredApprovers = 0
 
-┌────────────┬──────────┬────────┬───────────┬────────────────────────────────────────┐
-│  Control   │ Severity │ Status │ Resources │                 Title                  │
-├────────────┼──────────┼────────┼───────────┼────────────────────────────────────────┤
-│ CIS-1.1.15 │ HIGH     │ FAIL   │       1/3 │ No direct pushes to the default branch │
-└────────────┴──────────┴────────┴───────────┴────────────────────────────────────────┘
+...
 
-fix: Repository settings -> Branch permissions -> Add restriction: select
-     the default branch and enable "Prevent changes without a pull request".
+SCORE 52/100   15 passed  14 failed  19 manual  14 n/a
+      14 controls failed
+      weighted 30/57 (HIGH=3, MEDIUM=2, LOW=1; manual and n/a excluded)
+      scored 29 of 48 findings (60%); 19 could not be evaluated
 ```
 
 ---
@@ -76,8 +80,9 @@ that is enforced by a test rather than by convention.
 
 The most valuable contribution here is usually not code. A control that fires
 wrongly against a real instance, or remediation text that does not match what
-the UI actually says, is worth more than a refactor — most of this has only
-ever run against a stand-in server.
+the UI actually says, is worth more than a refactor. The end-to-end suites
+cover the versions we could boot, and a real deployment always has a shape no
+fixture thought of.
 
 Start with
 [bitbucket-bench's CONTRIBUTING.md](https://github.com/scm-bench/bitbucket-bench/blob/main/CONTRIBUTING.md)
@@ -86,7 +91,8 @@ of these tools, is in the
 [bench contract](https://github.com/scm-bench/scm-bench/blob/main/docs/bench-contract.md).
 
 Security issues go through private advisories on the repository concerned
-([bitbucket-bench](https://github.com/scm-bench/bitbucket-bench/security/advisories/new)),
+([bitbucket-bench](https://github.com/scm-bench/bitbucket-bench/security/advisories/new),
+[jenkins-bench](https://github.com/scm-bench/jenkins-bench/security/advisories/new)),
 never a public issue.
 
 <sub>Apache 2.0 · Not affiliated with CIS, Atlassian, Microsoft or the Jenkins project.</sub>
