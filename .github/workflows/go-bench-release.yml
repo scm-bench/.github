@@ -20,8 +20,9 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
+      # Credentials stay persisted: the "Create the tag" step pushes with them.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
+        with: # zizmor: ignore[artipacked]
           # goreleaser builds the changelog from history, which a shallow
           # clone does not have.
           fetch-depth: 0
@@ -54,7 +55,12 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
-          cache: true
+          # No cache in the job that signs. setup-go would restore the module
+          # and build caches that CI runs on main saved, and those runs execute
+          # third-party actions; anything they left in GOCACHE would be linked
+          # into a binary this job then signs and attests. A clean download is
+          # checked against go.sum; a restored cache is not.
+          cache: false
 
       - name: Run tests before releasing
         run: go test ./... -count=1

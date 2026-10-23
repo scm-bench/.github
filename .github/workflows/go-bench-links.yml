@@ -5,12 +5,17 @@ name: Go bench links
 on:
   workflow_call: {}
 
+permissions:
+  contents: read
+
 jobs:
   check:
     name: Reference URLs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Collect the URLs the tool hands to users
         run: |
@@ -35,7 +40,7 @@ jobs:
             code=$(curl -sSL -o /dev/null -w '%{http_code}' \
                      --retry 3 --retry-delay 2 --retry-all-errors \
                      --max-time 30 \
-                     -A "scm-bench-link-check (+https://github.com/${{ github.repository }})" \
+                     -A "scm-bench-link-check (+https://github.com/$GITHUB_REPOSITORY)" \
                      "$url" || echo 000)
 
             case "$code" in

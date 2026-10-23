@@ -26,6 +26,11 @@ on:
         type: string
         default: "internal/checks/policies"
 
+# Read-only whatever the caller grants: nothing here writes to the repository,
+# and a job that cannot write is one a compromised step cannot turn into a push.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test
@@ -37,9 +42,11 @@ jobs:
         # code that tells the platforms apart. Lint and coverage run once.
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-go@v7
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
@@ -88,7 +95,7 @@ jobs:
 
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage
           path: coverage.out
@@ -96,36 +103,43 @@ jobs:
   policy:
     name: Policy bundle
     runs-on: ubuntu-latest
+    # Inputs reach the shell through the environment, never through ${{ }}
+    # expansion, so a value is always data and never script.
+    env:
+      POLICY_PATH: ${{ inputs.policy-path }}
+      BENCH: ${{ inputs.bench }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-go@v7
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
 
-      - uses: open-policy-agent/setup-opa@v2
+      - uses: open-policy-agent/setup-opa@34a30e8a924d1b03ce2cf7abe97250bbb1f332b5 # v2.2.0
         with:
           version: latest
 
       # The Go tests compile the bundle, but opa check also catches unused
       # imports and style problems the compiler tolerates.
       - name: Check Rego
-        run: opa check --strict ${{ inputs.policy-path }}
+        run: opa check --strict "$POLICY_PATH"
 
       - name: Check Rego formatting
-        run: opa fmt --list --fail ${{ inputs.policy-path }}
+        run: opa fmt --list --fail "$POLICY_PATH"
 
       # Every verdict is decided in Rego, which go test -cover cannot see.
       - name: Run the policy unit tests
-        run: opa test ${{ inputs.policy-path }} -v
+        run: opa test "$POLICY_PATH" -v
 
       - name: Check policy coverage
         env:
           FLOOR: ${{ inputs.rego-coverage-floor }}
         run: |
           set -euo pipefail
-          opa test ${{ inputs.policy-path }} --coverage --format=json > policy-coverage.json
+          opa test "$POLICY_PATH" --coverage --format=json > policy-coverage.json
           # 100 by default: an uncovered branch is a verdict nobody has seen.
           jq -r '.coverage' policy-coverage.json | awk -v floor="$FLOOR" '{
             printf "policy coverage: %s%% (floor %s%%)\n", $1, floor
@@ -133,15 +147,17 @@ jobs:
           }'
 
       - name: Verify the bundle loads
-        run: go run ./cmd/${{ inputs.bench }} list-checks
+        run: go run "./cmd/$BENCH" list-checks
 
   vuln:
     name: Vulnerabilities
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-go@v7
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
@@ -155,15 +171,19 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-go@v7
+      # A snapshot build that publishes nothing, so a restored cache cannot
+      # reach a user; the release job, which does publish, runs without one.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
-          cache: true
+          cache: true # zizmor: ignore[cache-poisoning]
 
       # Finds a broken goreleaser config before a tag depends on it.
-      - uses: goreleaser/goreleaser-action@v7
+      - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           version: "~> v2"
           args: build --snapshot --clean
@@ -171,15 +191,19 @@ jobs:
   docker:
     name: Container image
     runs-on: ubuntu-latest
+    env:
+      BENCH: ${{ inputs.bench }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       # goreleaser build skips images, and a release cannot be unpublished —
       # so both Dockerfiles are checked here.
       - name: Build the source image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           push: false
@@ -189,10 +213,10 @@ jobs:
       - name: Check the image runs and is read-only about it
         run: |
           set -euo pipefail
-          docker run --rm ${{ inputs.bench }}:ci version
-          docker run --rm ${{ inputs.bench }}:ci list-checks | tail -1
+          docker run --rm "$BENCH:ci" version
+          docker run --rm "$BENCH:ci" list-checks | tail -1
           # Not as root: the image is handed a credential.
-          user=$(docker run --rm --entrypoint id ${{ inputs.bench }}:ci -u)
+          user=$(docker run --rm --entrypoint id "$BENCH:ci" -u)
           if [ "$user" = "0" ]; then
             echo "::error::the image runs as root"
             exit 1
@@ -202,6 +226,6 @@ jobs:
         run: |
           set -euo pipefail
           # Dockerfile.goreleaser expects a prebuilt binary; stand one in.
-          CGO_ENABLED=0 go build -trimpath -o ${{ inputs.bench }} ./cmd/${{ inputs.bench }}
-          docker build -f Dockerfile.goreleaser -t ${{ inputs.bench }}:ci-release .
-          docker run --rm ${{ inputs.bench }}:ci-release version
+          CGO_ENABLED=0 go build -trimpath -o "$BENCH" "./cmd/$BENCH"
+          docker build -f Dockerfile.goreleaser -t "$BENCH:ci-release" .
+          docker run --rm "$BENCH:ci-release" version
