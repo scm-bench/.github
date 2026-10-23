@@ -2,90 +2,53 @@
   {
     "slug": "scm-bench",
     "name": "scm-bench",
-    "subtitle": "Audit source control against the CIS Software Supply<br>Chain Benchmark.",
-    "tags": [
-      "READ-ONLY",
-      "REGO POLICIES",
-      "SARIF"
-    ],
-    "score": 53,
-    "counts": [
-      [
-        "PASS",
-        15
-      ],
-      [
-        "FAIL",
-        13
-      ],
-      [
-        "MANUAL",
-        19
-      ]
-    ]
+    "subtitle": "Audit source control and CI against the CIS Software<br>Supply Chain Benchmark.",
+    "tags": ["READ-ONLY", "REGO POLICIES", "SARIF", "JUNIT"],
+    "score": 52,
+    "counts": [["PASS", 15], ["FAIL", 14], ["MANUAL", 19]],
+    "social": {
+      "text": "Audit source control and CI against the CIS Software Supply Chain Benchmark — read-only snapshots, Rego policies, checkable verdicts.",
+      "url": "github.com/scm-bench",
+      "legend": true
+    }
   },
   {
     "slug": "bitbucket-bench",
     "name": "bitbucket-bench",
     "subtitle": "Audit Bitbucket Data Center against the CIS Software<br>Supply Chain Benchmark.",
-    "tags": [
-      "READ-ONLY",
-      "REGO POLICIES",
-      "SARIF"
-    ],
-    "score": 53,
-    "counts": [
-      [
-        "PASS",
-        15
-      ],
-      [
-        "FAIL",
-        13
-      ],
-      [
-        "MANUAL",
-        19
-      ]
-    ]
+    "tags": ["READ-ONLY", "REGO POLICIES", "SARIF", "JUNIT"],
+    "score": 52,
+    "counts": [["PASS", 15], ["FAIL", 14], ["MANUAL", 19]],
+    "social": {
+      "text": "Audit Bitbucket Data Center against the CIS Software Supply Chain Benchmark — read-only, verified on Data Center 8.19&nbsp;to&nbsp;10.5.",
+      "url": "github.com/scm-bench/bitbucket-bench"
+    }
   },
   {
     "slug": "jenkins-bench",
     "name": "jenkins-bench",
     "subtitle": "Audit Jenkins controllers against the CIS Software<br>Supply Chain Benchmark.",
-    "tags": [
-      "GET-ONLY",
-      "REGO POLICIES",
-      "SARIF"
-    ],
-    "score": 44,
-    "counts": [
-      [
-        "PASS",
-        7
-      ],
-      [
-        "FAIL",
-        7
-      ],
-      [
-        "MANUAL",
-        22
-      ]
-    ]
+    "tags": ["READ-ONLY", "REGO POLICIES", "SARIF", "JUNIT"],
+    "score": 41,
+    "counts": [["PASS", 5], ["FAIL", 6], ["MANUAL", 21]],
+    "social": {
+      "text": "Audit Jenkins controllers against the CIS Software Supply Chain Benchmark — read-only, verified on Jenkins&nbsp;2.580&nbsp;LTS.",
+      "url": "github.com/scm-bench/jenkins-bench"
+    }
   },
   {
     "slug": "azure-devops-bench",
     "name": "azure-devops-bench",
     "subtitle": "Audit Azure DevOps against the CIS Software Supply<br>Chain Benchmark.",
-    "tags": [
-      "PLANNED",
-      "SCM SNAPSHOT V1"
-    ],
-    "status": "PLANNED",
-    "statusrow": [
-      "SHARES THE SCM DOMAIN SCHEMA"
-    ],
-    "wordsize": 104
+    "status_tags": ["PREVIEW"],
+    "tags": ["READ-ONLY", "REGO POLICIES", "SARIF", "JUNIT"],
+    "score": 53,
+    "counts": [["PASS", 39], ["FAIL", 32], ["MANUAL", 14]],
+    "wordsize": 104,
+    "social": {
+      "text": "Audit Azure DevOps Services and Server against the CIS Software Supply Chain Benchmark — read-only, in preview.",
+      "url": "github.com/scm-bench/azure-devops-bench",
+      "wordsize": 88
+    }
   }
 ]
