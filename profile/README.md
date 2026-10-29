@@ -22,9 +22,9 @@ settings path to fix whatever it finds.
 
 | | | |
 |---|---|---|
-| [**bitbucket-bench**](https://github.com/scm-bench/bitbucket-bench) | Bitbucket Data Center | v0.1 · the reference implementation |
-| [**azure-devops-bench**](https://github.com/scm-bench/azure-devops-bench) | Azure DevOps / Azure Repos | planned |
-| [**jenkins-bench**](https://github.com/scm-bench/jenkins-bench) | Jenkins controllers | planned |
+| [**bitbucket-bench**](https://github.com/scm-bench/bitbucket-bench) | Bitbucket Data Center | [![release](https://img.shields.io/github/v/release/scm-bench/bitbucket-bench?include_prereleases&sort=semver&label=release)](https://github.com/scm-bench/bitbucket-bench/releases) · the reference implementation |
+| [**azure-devops-bench**](https://github.com/scm-bench/azure-devops-bench) | Azure DevOps / Azure Repos | [![release](https://img.shields.io/github/v/release/scm-bench/azure-devops-bench?include_prereleases&sort=semver&label=release)](https://github.com/scm-bench/azure-devops-bench/releases) |
+| [**jenkins-bench**](https://github.com/scm-bench/jenkins-bench) | Jenkins controllers | [![release](https://img.shields.io/github/v/release/scm-bench/jenkins-bench?include_prereleases&sort=semver&label=release)](https://github.com/scm-bench/jenkins-bench/releases) |
 | [**scm-bench**](https://github.com/scm-bench/scm-bench) | — | the specification they all follow |
 
 `scm-bench` is the umbrella: the policy contract, the control metadata format,
